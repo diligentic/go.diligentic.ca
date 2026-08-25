@@ -7,7 +7,7 @@
     {
       "binding": "CLICKS_DB",
       "database_name": "go-diligentic-clicks-production",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "a92c75d9-86b8-4003-afa6-d2e318bfc1ec",
       "migrations_dir": "migrations"
     }
   ],
@@ -17,7 +17,7 @@
         {
           "binding": "CLICKS_DB",
           "database_name": "go-diligentic-clicks-preview",
-          "database_id": "00000000-0000-0000-0000-000000000000",
+          "database_id": "8eada874-cded-4165-b960-4c3e2a341924",
           "migrations_dir": "migrations"
         }
       ]
