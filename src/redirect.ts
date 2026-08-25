@@ -85,4 +85,10 @@ export function createRedirectResponse(request: Request): Response {
   });
 }
 
+export function isTrackablePath(pathname: string): boolean {
+  return (
+    STATIC_ROUTES[pathname] !== undefined || youtubeAttribution(pathname) !== undefined
+  );
+}
+
 export { BOOKING_URL, STATIC_ROUTES };

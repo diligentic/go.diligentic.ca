@@ -1,6 +1,6 @@
 # `go.diligentic.ca`
 
-Cloudflare Pages Function for Diligentic booking redirects. It records exactly 2 values for each accepted `GET`: the request path and a UTC Unix timestamp in milliseconds. It does not store query strings, destinations, IP addresses, user agents, referrers, cookies or identifiers.
+Cloudflare Pages Function for Diligentic booking redirects. It records exactly 2 values for each recognized booking-path `GET`: the request path and a UTC Unix timestamp in milliseconds. Unknown paths still redirect to the bare booking URL but are not recorded, preventing generic crawler traffic from polluting click totals. It does not store query strings, destinations, IP addresses, user agents, referrers, cookies or identifiers.
 
 ## Local setup
 
@@ -47,7 +47,7 @@ The interval is inclusive at the start and exclusive at the end. Inputs must use
 npm run report -- go-diligentic-clicks-production 2026-09-01T00:00:00Z 2026-10-01T00:00:00Z
 ```
 
-The output is request count grouped by path. It is not a unique-user count. Compare it with Cal.com/Twenty bookings over the same UTC interval using `utm_source` and `utm_content`.
+The output is request count grouped by recognized booking path. The report also filters historical crawler paths collected before booking-path-only logging was introduced. It is not a unique-user count. Compare it with Cal.com/Twenty bookings over the same UTC interval using `utm_source` and `utm_content`.
 
 ## Availability monitor
 

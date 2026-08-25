@@ -66,6 +66,40 @@ describe("Pages middleware", () => {
     expect(pending).toHaveLength(0);
   });
 
+  it("writes a valid YouTube wildcard path", async () => {
+    const { context, pending, boundValues } = createContext(
+      "GET",
+      vi.fn().mockResolvedValue({ success: true }),
+      "https://go.diligentic.ca/youtube/my-video"
+    );
+
+    await onRequest(context as never);
+    await Promise.all(pending);
+
+    expect(boundValues).toEqual([["/youtube/my-video", expect.any(Number)]]);
+  });
+
+  it.each([
+    "/",
+    "/favicon.ico",
+    "/.env",
+    "/.git/HEAD",
+    "/unknown",
+    "/youtube/foo%2Fbar"
+  ])("redirects but does not write an unrecognized path: %s", async (path) => {
+    const { context, pending, prepare } = createContext(
+      "GET",
+      vi.fn().mockResolvedValue({ success: true }),
+      `https://go.diligentic.ca${path}`
+    );
+
+    const response = await onRequest(context as never);
+
+    expect(response.status).toBe(302);
+    expect(prepare).not.toHaveBeenCalled();
+    expect(pending).toHaveLength(0);
+  });
+
   it("returns the redirect immediately while the write is pending", async () => {
     let finishWrite: (() => void) | undefined;
     const delayedWrite = new Promise<{ success: true }>((resolve) => {

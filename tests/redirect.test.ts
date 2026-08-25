@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BOOKING_URL, createRedirectResponse, resolveDestination, STATIC_ROUTES } from "../src/redirect";
+import {
+  BOOKING_URL,
+  createRedirectResponse,
+  isTrackablePath,
+  resolveDestination,
+  STATIC_ROUTES
+} from "../src/redirect";
 
 const expectedStaticDestinations: Record<string, string> = {
   "/linkedin/about": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=ajay-about",
@@ -60,6 +66,35 @@ describe("resolveDestination", () => {
     "/youtube/%E0%A4%A"
   ])("falls back safely for %s", (path) => {
     expect(resolveDestination(path)).toBe(BOOKING_URL);
+  });
+});
+
+describe("isTrackablePath", () => {
+  it.each([
+    "/linkedin/about",
+    "/youtube/channel",
+    "/youtube/my-video",
+    "/youtube/Channel",
+    "/youtube/bad_slug",
+    "/youtube/video%20name"
+  ])("accepts a recognized booking path: %s", (path) => {
+    expect(isTrackablePath(path)).toBe(true);
+  });
+
+  it.each([
+    "/",
+    "/favicon.ico",
+    "/.env",
+    "/.git/HEAD",
+    "/unknown",
+    "/linkedin/about/",
+    "/youtube/",
+    "/youtube/a/b",
+    "/youtube/a%2Fb",
+    "/youtube/a%5Cb",
+    "/youtube/%E0%A4%A"
+  ])("rejects an unrecognized path: %s", (path) => {
+    expect(isTrackablePath(path)).toBe(false);
   });
 });
 

@@ -1,4 +1,4 @@
-import { createRedirectResponse } from "../src/redirect";
+import { createRedirectResponse, isTrackablePath } from "../src/redirect";
 
 interface Env {
   CLICKS_DB: D1Database;
@@ -10,9 +10,9 @@ function reportWriteFailure(): void {
 
 export const onRequest: PagesFunction<Env> = (context) => {
   const response = createRedirectResponse(context.request);
+  const pathname = new URL(context.request.url).pathname;
 
-  if (context.request.method === "GET") {
-    const pathname = new URL(context.request.url).pathname;
+  if (context.request.method === "GET" && isTrackablePath(pathname)) {
     const clickedAt = Date.now();
     try {
       const write = Promise.resolve(
