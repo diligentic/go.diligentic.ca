@@ -1,0 +1,24 @@
+{
+  "name": "links-diligentic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm test",
+    "deploy:preview": "wrangler pages deploy public --branch preview",
+    "deploy:production": "wrangler pages deploy public --branch main",
+    "db:migrate:local": "wrangler d1 migrations apply go-diligentic-clicks-production --local",
+    "db:migrate:preview": "wrangler d1 migrations apply go-diligentic-clicks-preview --env preview --remote",
+    "db:migrate:production": "wrangler d1 migrations apply go-diligentic-clicks-production --remote",
+    "report": "node scripts/report-clicks.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260825.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.125.0"
+  }
+}
