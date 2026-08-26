@@ -9,11 +9,7 @@
     "test": "vitest run",
     "verify": "npm run typecheck && npm test",
     "deploy:preview": "wrangler pages deploy public --branch preview",
-    "deploy:production": "wrangler pages deploy public --branch main",
-    "db:migrate:local": "wrangler d1 migrations apply go-diligentic-clicks-production --local",
-    "db:migrate:preview": "wrangler d1 migrations apply go-diligentic-clicks-preview --env preview --remote",
-    "db:migrate:production": "wrangler d1 migrations apply go-diligentic-clicks-production --remote",
-    "report": "node scripts/report-clicks.mjs"
+    "deploy:production": "wrangler pages deploy public --branch main"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260825.1",

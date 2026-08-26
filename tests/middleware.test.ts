@@ -1,82 +1,82 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { onRequest } from "../functions/_middleware";
-
-type PendingTask = Promise<unknown>;
 
 function createContext(
   method = "GET",
-  run = vi.fn().mockResolvedValue({ success: true }),
-  url = "https://go.diligentic.ca/linkedin/about"
+  url = "https://go.diligentic.ca/linkedin/about",
+  gtmContainerId = "GTM-TEST123"
 ) {
-  const boundValues: unknown[][] = [];
-  const pending: PendingTask[] = [];
-  const bind = vi.fn((...values: unknown[]) => {
-    boundValues.push(values);
-    return { run };
-  });
-  const prepare = vi.fn(() => ({ bind }));
-  const context = {
+  return {
     request: new Request(url, { method }),
-    env: { CLICKS_DB: { prepare } },
-    waitUntil: (promise: PendingTask) => pending.push(promise)
+    env: { GTM_CONTAINER_ID: gtmContainerId },
+    waitUntil: () => undefined
   };
-
-  return { context, pending, boundValues, prepare, bind, run };
 }
 
-afterEach(() => {
-  vi.restoreAllMocks();
-});
-
 describe("Pages middleware", () => {
-  it("writes only path and timestamp for GET", async () => {
-    const { context, pending, boundValues, prepare } = createContext();
-    const response = await onRequest(context as never);
-    await Promise.all(pending);
+  it("serves a GTM tracking handoff page for recognized GET paths", async () => {
+    const response = await onRequest(createContext() as never);
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
+    expect(response.headers.get("cache-control")).toBe("no-store, max-age=0");
+    expect(body).toContain("https://www.googletagmanager.com/gtm.js?id=");
+    expect(body).toContain("GTM-TEST123");
+    expect(body).toContain("booking_link_click");
+    expect(body).toContain('"link_path":"/linkedin/about"');
+    expect(body).toContain('"link_source":"linkedin"');
+    expect(body).toContain('"link_medium":"profile"');
+    expect(body).toContain('"link_campaign":"brand"');
+    expect(body).toContain('"link_content":"ajay-about"');
+    expect(body).toContain(
+      "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin"
+    );
+  });
+
+  it("serves a tracking handoff page even if the GTM id is not configured", async () => {
+    const response = await onRequest(createContext("GET", undefined, "") as never);
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(body).not.toContain("googletagmanager.com/gtm.js");
+    expect(body).toContain("booking_link_click");
+    expect(body).toContain("window.setTimeout(continueToBooking, 1200)");
+  });
+
+  it("does not preserve attacker query parameters in the destination", async () => {
+    const response = await onRequest(
+      createContext(
+        "GET",
+        "https://go.diligentic.ca/linkedin/about?utm_source=attacker&private=value"
+      ) as never
+    );
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(body).toContain('"link_source":"linkedin"');
+    expect(body).not.toContain("attacker");
+    expect(body).not.toContain("private=value");
+  });
+
+  it("escapes encoded YouTube content for script context", async () => {
+    const response = await onRequest(
+      createContext("GET", "https://go.diligentic.ca/youtube/%3Cscript%3E") as never
+    );
+    const body = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(body).toContain("\\u003cscript\\u003e");
+    expect(body).not.toContain('"link_content":"<script>"');
+  });
+
+  it("keeps HEAD as a plain redirect for availability monitors", async () => {
+    const response = await onRequest(createContext("HEAD") as never);
 
     expect(response.status).toBe(302);
-    expect(prepare).toHaveBeenCalledWith(
-      "INSERT INTO clicks (path, clicked_at) VALUES (?1, ?2)"
+    expect(response.headers.get("location")).toBe(
+      "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=ajay-about"
     );
-    expect(boundValues).toHaveLength(1);
-    expect(boundValues[0][0]).toBe("/linkedin/about");
-    expect(boundValues[0][1]).toEqual(expect.any(Number));
-    expect(boundValues[0]).toHaveLength(2);
-  });
-
-  it("does not store the incoming query string", async () => {
-    const { context, pending, boundValues } = createContext(
-      "GET",
-      vi.fn().mockResolvedValue({ success: true }),
-      "https://go.diligentic.ca/linkedin/about?utm_source=attacker&private=value"
-    );
-
-    await onRequest(context as never);
-    await Promise.all(pending);
-
-    expect(boundValues).toEqual([["/linkedin/about", expect.any(Number)]]);
-  });
-
-  it("does not write for HEAD", async () => {
-    const { context, pending, prepare } = createContext("HEAD");
-    const response = await onRequest(context as never);
-
-    expect(response.status).toBe(302);
-    expect(prepare).not.toHaveBeenCalled();
-    expect(pending).toHaveLength(0);
-  });
-
-  it("writes a valid YouTube wildcard path", async () => {
-    const { context, pending, boundValues } = createContext(
-      "GET",
-      vi.fn().mockResolvedValue({ success: true }),
-      "https://go.diligentic.ca/youtube/my-video"
-    );
-
-    await onRequest(context as never);
-    await Promise.all(pending);
-
-    expect(boundValues).toEqual([["/youtube/my-video", expect.any(Number)]]);
   });
 
   it.each([
@@ -86,60 +86,22 @@ describe("Pages middleware", () => {
     "/.git/HEAD",
     "/unknown",
     "/youtube/foo%2Fbar"
-  ])("redirects but does not write an unrecognized path: %s", async (path) => {
-    const { context, pending, prepare } = createContext(
-      "GET",
-      vi.fn().mockResolvedValue({ success: true }),
-      `https://go.diligentic.ca${path}`
+  ])("keeps unrecognized GET paths as direct redirects: %s", async (path) => {
+    const response = await onRequest(
+      createContext("GET", `https://go.diligentic.ca${path}`) as never
     );
 
-    const response = await onRequest(context as never);
-
     expect(response.status).toBe(302);
-    expect(prepare).not.toHaveBeenCalled();
-    expect(pending).toHaveLength(0);
-  });
-
-  it("returns the redirect immediately while the write is pending", async () => {
-    let finishWrite: (() => void) | undefined;
-    const delayedWrite = new Promise<{ success: true }>((resolve) => {
-      finishWrite = () => resolve({ success: true });
-    });
-    const { context, pending } = createContext("GET", vi.fn(() => delayedWrite));
-
-    const response = await onRequest(context as never);
-    expect(response.status).toBe(302);
-    expect(pending).toHaveLength(1);
-
-    finishWrite?.();
-    await Promise.all(pending);
-  });
-
-  it("keeps the redirect successful when D1 rejects the write", async () => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const { context, pending } = createContext(
-      "GET",
-      vi.fn().mockRejectedValue(new Error("database unavailable"))
+    expect(response.headers.get("location")).toBe(
+      "https://cal.com/diligentic-ajay/discovery"
     );
-
-    const response = await onRequest(context as never);
-    await Promise.all(pending);
-
-    expect(response.status).toBe(302);
-    expect(error).toHaveBeenCalledWith("D1 click insert failed");
   });
 
-  it("keeps the redirect successful when D1 throws synchronously", async () => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const { context, pending } = createContext();
-    context.env.CLICKS_DB.prepare = vi.fn(() => {
-      throw new Error("binding unavailable");
-    });
+  it("rejects methods other than GET and HEAD", async () => {
+    const response = await onRequest(createContext("POST") as never);
 
-    const response = await onRequest(context as never);
-
-    expect(response.status).toBe(302);
-    expect(pending).toHaveLength(0);
-    expect(error).toHaveBeenCalledWith("D1 click insert failed");
+    expect(response.status).toBe(405);
+    expect(response.headers.get("allow")).toBe("GET, HEAD");
+    expect(response.headers.get("location")).toBeNull();
   });
 });

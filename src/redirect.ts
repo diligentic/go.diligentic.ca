@@ -6,6 +6,15 @@ type Attribution = Readonly<{
   content: string;
 }>;
 
+export type TrackingPayload = Readonly<{
+  path: string;
+  destination: string;
+  source: string;
+  medium: string;
+  campaign: string;
+  content: string;
+}>;
+
 const BRAND_CAMPAIGN = "brand";
 
 const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
@@ -64,6 +73,22 @@ export function resolveDestination(pathname: string): string {
   return attribution ? buildTaggedDestination(attribution) : BOOKING_URL;
 }
 
+export function resolveTrackingPayload(pathname: string): TrackingPayload | undefined {
+  const attribution = STATIC_ROUTES[pathname] ?? youtubeAttribution(pathname);
+  if (!attribution) {
+    return undefined;
+  }
+
+  return {
+    path: pathname,
+    destination: buildTaggedDestination(attribution),
+    source: attribution.source,
+    medium: attribution.medium,
+    campaign: BRAND_CAMPAIGN,
+    content: attribution.content
+  };
+}
+
 export function createRedirectResponse(request: Request): Response {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response(null, {
@@ -86,9 +111,7 @@ export function createRedirectResponse(request: Request): Response {
 }
 
 export function isTrackablePath(pathname: string): boolean {
-  return (
-    STATIC_ROUTES[pathname] !== undefined || youtubeAttribution(pathname) !== undefined
-  );
+  return resolveTrackingPayload(pathname) !== undefined;
 }
 
 export { BOOKING_URL, STATIC_ROUTES };

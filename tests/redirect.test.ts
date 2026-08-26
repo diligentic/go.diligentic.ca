@@ -3,6 +3,7 @@ import {
   BOOKING_URL,
   createRedirectResponse,
   isTrackablePath,
+  resolveTrackingPayload,
   resolveDestination,
   STATIC_ROUTES
 } from "../src/redirect";
@@ -66,6 +67,23 @@ describe("resolveDestination", () => {
     "/youtube/%E0%A4%A"
   ])("falls back safely for %s", (path) => {
     expect(resolveDestination(path)).toBe(BOOKING_URL);
+  });
+});
+
+describe("resolveTrackingPayload", () => {
+  it("returns GA event parameters for recognized booking paths", () => {
+    expect(resolveTrackingPayload("/linkedin/about")).toEqual({
+      path: "/linkedin/about",
+      destination: expectedStaticDestinations["/linkedin/about"],
+      source: "linkedin",
+      medium: "profile",
+      campaign: "brand",
+      content: "ajay-about"
+    });
+  });
+
+  it("returns undefined for unrecognized paths", () => {
+    expect(resolveTrackingPayload("/unknown")).toBeUndefined();
   });
 });
 

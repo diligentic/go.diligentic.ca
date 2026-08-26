@@ -1,53 +1,46 @@
 # `go.diligentic.ca`
 
-Cloudflare Pages Function for Diligentic booking redirects. It records exactly 2 values for each recognized booking-path `GET`: the request path and a UTC Unix timestamp in milliseconds. Unknown paths still redirect to the bare booking URL but are not recorded, preventing generic crawler traffic from polluting click totals. It does not store query strings, destinations, IP addresses, user agents, referrers, cookies or identifiers.
+Cloudflare Pages Function for Diligentic booking redirects. Recognized booking-path `GET` requests return a tiny noindex handoff page that pushes a `booking_link_click` event to Google Tag Manager, then redirects to the tagged Cal.com URL. Unknown paths and `HEAD` requests stay as direct `302` redirects.
 
 ## Local setup
 
 ```bash
 npm install
 npm run verify
-npm run db:migrate:local
 npm run dev
 ```
 
-Local D1 data is isolated by Wrangler. `HEAD` requests redirect without creating a row.
+Local development redirects normally even when `GTM_CONTAINER_ID` is not configured. `HEAD` requests remain plain redirects for availability monitors.
 
 `public/index.html` exists only because Cloudflare Pages requires a non-empty output directory. `_routes.json` sends every path through `_middleware.ts`, which never calls `context.next()`, so the static file is intentionally never served.
 
 ## Cloudflare setup
 
 1. Create the Pages project `go-diligentic-ca`.
-2. Create D1 databases named `go-diligentic-clicks-preview` and `go-diligentic-clicks-production`.
-3. Replace the top-level zero UUID in `wrangler.jsonc` with the production database ID and the `env.preview` zero UUID with the preview database ID.
-4. Apply both migrations:
-
-```bash
-npm run db:migrate:preview
-npm run db:migrate:production
-```
-
-5. Deploy preview, verify it, then deploy production:
+2. Set `GTM_CONTAINER_ID` in Cloudflare Pages environment variables, or add it to `wrangler.jsonc` before deployment. Use the same GTM container that sends events to the existing Diligentic GA4 property.
+3. Deploy preview, verify it, then deploy production:
 
 ```bash
 npm run deploy:preview
 npm run deploy:production
 ```
 
-6. Add `go.diligentic.ca` to the Pages project's custom domains before creating the external DNS CNAME. Add Cloudflare's ownership-verification TXT record first if the dashboard requests one.
-7. Point `go.diligentic.ca` to the assigned `<project>.pages.dev` hostname. Do not change the apex, `www`, nameservers or existing Netlify records.
+4. Add `go.diligentic.ca` to the Pages project's custom domains before creating the external DNS CNAME. Add Cloudflare's ownership-verification TXT record first if the dashboard requests one.
+5. Point `go.diligentic.ca` to the assigned `<project>.pages.dev` hostname. Do not change the apex, `www`, nameservers or existing Netlify records.
 
-The production branch must be `main`, or the deploy scripts must be changed to the branch configured as production in Cloudflare Pages. Top-level Wrangler bindings apply to production; `env.preview` overrides them for preview deployments.
+The production branch must be `main`, or the deploy scripts must be changed to the branch configured as production in Cloudflare Pages.
 
-## Reporting
+## GTM setup
 
-The interval is inclusive at the start and exclusive at the end. Inputs must use ISO 8601 UTC with a trailing `Z`; timezone-less values and offsets are rejected:
+Create a GA4 event tag in GTM:
 
-```bash
-npm run report -- go-diligentic-clicks-production 2026-09-01T00:00:00Z 2026-10-01T00:00:00Z
-```
+- Event name: `booking_link_click`
+- Trigger: custom event `booking_link_click`
+- Parameters: `link_path`, `link_source`, `link_medium`, `link_campaign`, `link_content`
 
-The output is request count grouped by recognized booking path. The report also filters historical crawler paths collected before booking-path-only logging was introduced. It is not a unique-user count. Compare it with Cal.com/Twenty bookings over the same UTC interval using `utm_source` and `utm_content`.
+Register those parameters as event-scoped custom dimensions in GA4 before relying on standard reports. Use Cal.com's GTM integration to send the booking-success event into the same GA4 property.
+
+Cloudflare D1 is no longer used for click analytics. GA4/GTM is the reporting source of truth.
 
 ## Availability monitor
 
