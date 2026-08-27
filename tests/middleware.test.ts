@@ -3,7 +3,7 @@ import { onRequest } from "../functions/_middleware";
 
 function createContext(
   method = "GET",
-  url = "https://go.diligentic.ca/linkedin/about",
+  url = "https://links.diligentic.ca/linkedin/about",
   gtmContainerId = "GTM-TEST123"
 ) {
   return {
@@ -48,7 +48,7 @@ describe("Pages middleware", () => {
     const response = await onRequest(
       createContext(
         "GET",
-        "https://go.diligentic.ca/linkedin/about?utm_source=attacker&private=value"
+        "https://links.diligentic.ca/linkedin/about?utm_source=attacker&private=value"
       ) as never
     );
     const body = await response.text();
@@ -61,7 +61,7 @@ describe("Pages middleware", () => {
 
   it("escapes encoded YouTube content for script context", async () => {
     const response = await onRequest(
-      createContext("GET", "https://go.diligentic.ca/youtube/%3Cscript%3E") as never
+      createContext("GET", "https://links.diligentic.ca/youtube/%3Cscript%3E") as never
     );
     const body = await response.text();
 
@@ -88,7 +88,7 @@ describe("Pages middleware", () => {
     "/youtube/foo%2Fbar"
   ])("keeps unrecognized GET paths as direct redirects: %s", async (path) => {
     const response = await onRequest(
-      createContext("GET", `https://go.diligentic.ca${path}`) as never
+      createContext("GET", `https://links.diligentic.ca${path}`) as never
     );
 
     expect(response.status).toBe(302);

@@ -119,7 +119,7 @@ describe("isTrackablePath", () => {
 describe("createRedirectResponse", () => {
   it("returns an uncached 302 and ignores the incoming query", () => {
     const response = createRedirectResponse(
-      new Request("https://go.diligentic.ca/linkedin/about?utm_source=attacker&utm_content=attacker")
+      new Request("https://links.diligentic.ca/linkedin/about?utm_source=attacker&utm_content=attacker")
     );
 
     expect(response.status).toBe(302);
@@ -129,7 +129,7 @@ describe("createRedirectResponse", () => {
 
   it("returns the same redirect for HEAD", () => {
     const response = createRedirectResponse(
-      new Request("https://go.diligentic.ca/linkedin/about", { method: "HEAD" })
+      new Request("https://links.diligentic.ca/linkedin/about", { method: "HEAD" })
     );
 
     expect(response.status).toBe(302);
@@ -138,7 +138,7 @@ describe("createRedirectResponse", () => {
 
   it("rejects methods other than GET and HEAD", () => {
     const response = createRedirectResponse(
-      new Request("https://go.diligentic.ca/linkedin/about", { method: "POST" })
+      new Request("https://links.diligentic.ca/linkedin/about", { method: "POST" })
     );
 
     expect(response.status).toBe(405);
