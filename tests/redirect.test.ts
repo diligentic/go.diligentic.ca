@@ -19,12 +19,13 @@ const expectedStaticDestinations: Record<string, string> = {
   "/facebook/post": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-profile&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
   "/instagram/post": "https://cal.com/diligentic-ajay/discovery?utm_source=instagram&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
   "/tiktok/post": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
+  "/email/ajay": "https://cal.com/diligentic-ajay/discovery?utm_source=email-direct&utm_medium=email&utm_campaign=brand&utm_content=ajay",
   "/alignable/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=profile&utm_campaign=brand&utm_content=ideal-customers"
 };
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(11);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(12);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
