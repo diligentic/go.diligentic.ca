@@ -23,13 +23,21 @@ const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
   "/company/about": { source: "linkedin", medium: "profile", content: "company-about" },
   "/company/services": { source: "linkedin", medium: "profile", content: "company-services" },
   "/youtube/channel": { source: "youtube", medium: "profile", content: "channel" },
-  "/youtube/comment": { source: "youtube", medium: "organic", content: "ajay-comment" },
-  "/facebook/intro": { source: "facebook-profile", medium: "profile", content: "ajay-intro" },
-  "/facebook/post": { source: "facebook-profile", medium: "organic", content: "ajay-post" },
-  "/instagram/post": { source: "instagram", medium: "organic", content: "ajay-post" },
-  "/tiktok/post": { source: "tiktok", medium: "organic", content: "ajay-post" },
   "/email/ajay": { source: "email-direct", medium: "email", content: "ajay" },
-  "/alignable/profile": { source: "alignable", medium: "profile", content: "ideal-customers" }
+  "/alignable/profile": { source: "alignable", medium: "profile", content: "ideal-customers" },
+  "/linkedin/cta": { source: "linkedin", medium: "profile", content: "ajay-cta" },
+  "/linkedin/dm": { source: "linkedin", medium: "dm", content: "ajay-dm" },
+  "/company/cta": { source: "linkedin", medium: "profile", content: "company-cta" },
+  "/facebook/profile": { source: "facebook-profile", medium: "profile", content: "ajay-contact" },
+  "/facebook/page": { source: "facebook-page", medium: "profile", content: "book-now" },
+  "/facebook/group": { source: "facebook-group", medium: "organic", content: "group-post" },
+  "/facebook/dm": { source: "facebook-profile", medium: "dm", content: "ajay-dm" },
+  "/instagram/bio": { source: "instagram", medium: "profile", content: "ajay-bio" },
+  "/instagram/dm": { source: "instagram", medium: "dm", content: "ajay-dm" },
+  "/tiktok/bio": { source: "tiktok", medium: "profile", content: "ajay-bio" },
+  "/tiktok/dm": { source: "tiktok", medium: "dm", content: "ajay-dm" },
+  "/alignable/dm": { source: "alignable", medium: "dm", content: "ajay-dm" },
+  "/gmb/book": { source: "gmb", medium: "profile", content: "book-online" }
 });
 
 function youtubeAttribution(pathname: string): Attribution | undefined {
@@ -51,10 +59,6 @@ function youtubeAttribution(pathname: string): Attribution | undefined {
 
   if (segment === "channel") {
     return STATIC_ROUTES["/youtube/channel"];
-  }
-
-  if (segment === "comment") {
-    return STATIC_ROUTES["/youtube/comment"];
   }
 
   return { source: "youtube", medium: "organic", content: segment };

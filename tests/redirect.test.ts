@@ -14,18 +14,26 @@ const expectedStaticDestinations: Record<string, string> = {
   "/company/about": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-about",
   "/company/services": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-services",
   "/youtube/channel": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=profile&utm_campaign=brand&utm_content=channel",
-  "/youtube/comment": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=organic&utm_campaign=brand&utm_content=ajay-comment",
-  "/facebook/intro": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-profile&utm_medium=profile&utm_campaign=brand&utm_content=ajay-intro",
-  "/facebook/post": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-profile&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
-  "/instagram/post": "https://cal.com/diligentic-ajay/discovery?utm_source=instagram&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
-  "/tiktok/post": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
   "/email/ajay": "https://cal.com/diligentic-ajay/discovery?utm_source=email-direct&utm_medium=email&utm_campaign=brand&utm_content=ajay",
-  "/alignable/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=profile&utm_campaign=brand&utm_content=ideal-customers"
+  "/alignable/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=profile&utm_campaign=brand&utm_content=ideal-customers",
+  "/linkedin/cta": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=ajay-cta",
+  "/linkedin/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
+  "/company/cta": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-cta",
+  "/facebook/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-profile&utm_medium=profile&utm_campaign=brand&utm_content=ajay-contact",
+  "/facebook/page": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-page&utm_medium=profile&utm_campaign=brand&utm_content=book-now",
+  "/facebook/group": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-group&utm_medium=organic&utm_campaign=brand&utm_content=group-post",
+  "/facebook/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=facebook-profile&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
+  "/instagram/bio": "https://cal.com/diligentic-ajay/discovery?utm_source=instagram&utm_medium=profile&utm_campaign=brand&utm_content=ajay-bio",
+  "/instagram/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=instagram&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
+  "/tiktok/bio": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=profile&utm_campaign=brand&utm_content=ajay-bio",
+  "/tiktok/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
+  "/alignable/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
+  "/gmb/book": "https://cal.com/diligentic-ajay/discovery?utm_source=gmb&utm_medium=profile&utm_campaign=brand&utm_content=book-online"
 };
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(12);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(20);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
