@@ -22,7 +22,8 @@ const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
   "/linkedin/post": { source: "linkedin", medium: "organic", content: "ajay-post" },
   "/company/about": { source: "linkedin", medium: "profile", content: "company-about" },
   "/company/services": { source: "linkedin", medium: "profile", content: "company-services" },
-  "/youtube/channel": { source: "youtube", medium: "profile", content: "channel" },
+  "/youtube/yycaiguy": { source: "youtube", medium: "profile", content: "ajay-channel" },
+  "/youtube/company": { source: "youtube", medium: "profile", content: "company-channel" },
   "/email/ajay": { source: "email-direct", medium: "email", content: "ajay" },
   "/alignable/profile": { source: "alignable", medium: "profile", content: "ideal-customers" },
   "/linkedin/cta": { source: "linkedin", medium: "profile", content: "ajay-cta" },
@@ -57,9 +58,8 @@ function youtubeAttribution(pathname: string): Attribution | undefined {
     return undefined;
   }
 
-  if (segment === "channel") {
-    return STATIC_ROUTES["/youtube/channel"];
-  }
+  const staticAttribution = STATIC_ROUTES[`/youtube/${segment}`];
+  if (staticAttribution) return staticAttribution;
 
   return { source: "youtube", medium: "organic", content: segment };
 }

@@ -13,7 +13,8 @@ const expectedStaticDestinations: Record<string, string> = {
   "/linkedin/post": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=organic&utm_campaign=brand&utm_content=ajay-post",
   "/company/about": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-about",
   "/company/services": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-services",
-  "/youtube/channel": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=profile&utm_campaign=brand&utm_content=channel",
+  "/youtube/yycaiguy": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=profile&utm_campaign=brand&utm_content=ajay-channel",
+  "/youtube/company": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=profile&utm_campaign=brand&utm_content=company-channel",
   "/email/ajay": "https://cal.com/diligentic-ajay/discovery?utm_source=email-direct&utm_medium=email&utm_campaign=brand&utm_content=ajay",
   "/alignable/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=profile&utm_campaign=brand&utm_content=ideal-customers",
   "/linkedin/cta": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=ajay-cta",
@@ -33,7 +34,7 @@ const expectedStaticDestinations: Record<string, string> = {
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(20);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(21);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
@@ -59,11 +60,6 @@ describe("resolveDestination", () => {
     expect(destination.searchParams.get("utm_content")).toBe("video name");
   });
 
-  it("treats an encoded reserved YouTube segment as the reserved route", () => {
-    expect(resolveDestination("/youtube/%63hannel")).toBe(
-      expectedStaticDestinations["/youtube/channel"]
-    );
-  });
 
   it.each([
     "/",
@@ -99,7 +95,6 @@ describe("resolveTrackingPayload", () => {
 describe("isTrackablePath", () => {
   it.each([
     "/linkedin/about",
-    "/youtube/channel",
     "/youtube/my-video",
     "/youtube/Channel",
     "/youtube/bad_slug",
