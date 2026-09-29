@@ -26,6 +26,7 @@ const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
   "/youtube/company": { source: "youtube", medium: "profile", content: "company-channel" },
   "/email/ajay": { source: "email-direct", medium: "email", content: "ajay" },
   "/alignable/profile": { source: "alignable", medium: "profile", content: "ideal-customers" },
+  "/clutch/profile": { source: "clutch", medium: "profile", content: "company-profile" },
   "/linkedin/cta": { source: "linkedin", medium: "profile", content: "ajay-cta" },
   "/linkedin/dm": { source: "linkedin", medium: "dm", content: "ajay-dm" },
   "/company/cta": { source: "linkedin", medium: "profile", content: "company-cta" },

@@ -17,6 +17,7 @@ const expectedStaticDestinations: Record<string, string> = {
   "/youtube/company": "https://cal.com/diligentic-ajay/discovery?utm_source=youtube&utm_medium=profile&utm_campaign=brand&utm_content=company-channel",
   "/email/ajay": "https://cal.com/diligentic-ajay/discovery?utm_source=email-direct&utm_medium=email&utm_campaign=brand&utm_content=ajay",
   "/alignable/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=profile&utm_campaign=brand&utm_content=ideal-customers",
+  "/clutch/profile": "https://cal.com/diligentic-ajay/discovery?utm_source=clutch&utm_medium=profile&utm_campaign=brand&utm_content=company-profile",
   "/linkedin/cta": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=ajay-cta",
   "/linkedin/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
   "/company/cta": "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin&utm_medium=profile&utm_campaign=brand&utm_content=company-cta",
@@ -34,7 +35,7 @@ const expectedStaticDestinations: Record<string, string> = {
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(21);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(22);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
