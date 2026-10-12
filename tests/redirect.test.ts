@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  BOOKING_URL,
+  DEFAULT_DISCOVERY_BOOKING_URL,
   createRedirectResponse,
   isTrackablePath,
   resolveTrackingPayload,
@@ -30,12 +30,13 @@ const expectedStaticDestinations: Record<string, string> = {
   "/tiktok/bio": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=profile&utm_campaign=brand&utm_content=ajay-bio",
   "/tiktok/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=tiktok&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
   "/alignable/dm": "https://cal.com/diligentic-ajay/discovery?utm_source=alignable&utm_medium=dm&utm_campaign=brand&utm_content=ajay-dm",
-  "/gmb/book": "https://cal.com/diligentic-ajay/discovery?utm_source=gmb&utm_medium=profile&utm_campaign=brand&utm_content=book-online"
+  "/gmb/book": "https://cal.com/diligentic-ajay/discovery?utm_source=gmb&utm_medium=profile&utm_campaign=brand&utm_content=book-online",
+  "/crca-cwic/members": "https://cal.com/diligentic-ajay/crca-cwic-members?utm_source=partner&utm_medium=organic&utm_campaign=crca-perk-oct26&utm_content=crca-cwic"
 };
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(22);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(23);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
@@ -72,7 +73,7 @@ describe("resolveDestination", () => {
     "/youtube/a%5Cb",
     "/youtube/%E0%A4%A"
   ])("falls back safely for %s", (path) => {
-    expect(resolveDestination(path)).toBe(BOOKING_URL);
+    expect(resolveDestination(path)).toBe(DEFAULT_DISCOVERY_BOOKING_URL);
   });
 });
 
@@ -85,6 +86,17 @@ describe("resolveTrackingPayload", () => {
       medium: "profile",
       campaign: "brand",
       content: "ajay-about"
+    });
+  });
+
+  it("carries a route's own campaign and booking page", () => {
+    expect(resolveTrackingPayload("/crca-cwic/members")).toEqual({
+      path: "/crca-cwic/members",
+      destination: expectedStaticDestinations["/crca-cwic/members"],
+      source: "partner",
+      medium: "organic",
+      campaign: "crca-perk-oct26",
+      content: "crca-cwic"
     });
   });
 

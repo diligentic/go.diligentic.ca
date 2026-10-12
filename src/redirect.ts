@@ -1,9 +1,12 @@
-const BOOKING_URL = "https://cal.com/diligentic-ajay/discovery";
+const DEFAULT_DISCOVERY_BOOKING_URL = "https://cal.com/diligentic-ajay/discovery";
+const CRCA_CWIC_BOOKING_URL = "https://cal.com/diligentic-ajay/crca-cwic-members";
 
 type Attribution = Readonly<{
   source: string;
   medium: string;
   content: string;
+  campaign?: string;
+  bookingUrl?: string;
 }>;
 
 export type TrackingPayload = Readonly<{
@@ -39,7 +42,14 @@ const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
   "/tiktok/bio": { source: "tiktok", medium: "profile", content: "ajay-bio" },
   "/tiktok/dm": { source: "tiktok", medium: "dm", content: "ajay-dm" },
   "/alignable/dm": { source: "alignable", medium: "dm", content: "ajay-dm" },
-  "/gmb/book": { source: "gmb", medium: "profile", content: "book-online" }
+  "/gmb/book": { source: "gmb", medium: "profile", content: "book-online" },
+  "/crca-cwic/members": {
+    source: "partner",
+    medium: "organic",
+    content: "crca-cwic",
+    campaign: "crca-perk-oct26",
+    bookingUrl: CRCA_CWIC_BOOKING_URL
+  }
 });
 
 function youtubeAttribution(pathname: string): Attribution | undefined {
@@ -66,17 +76,17 @@ function youtubeAttribution(pathname: string): Attribution | undefined {
 }
 
 function buildTaggedDestination(attribution: Attribution): string {
-  const destination = new URL(BOOKING_URL);
+  const destination = new URL(attribution.bookingUrl ?? DEFAULT_DISCOVERY_BOOKING_URL);
   destination.searchParams.set("utm_source", attribution.source);
   destination.searchParams.set("utm_medium", attribution.medium);
-  destination.searchParams.set("utm_campaign", BRAND_CAMPAIGN);
+  destination.searchParams.set("utm_campaign", attribution.campaign ?? BRAND_CAMPAIGN);
   destination.searchParams.set("utm_content", attribution.content);
   return destination.toString();
 }
 
 export function resolveDestination(pathname: string): string {
   const attribution = STATIC_ROUTES[pathname] ?? youtubeAttribution(pathname);
-  return attribution ? buildTaggedDestination(attribution) : BOOKING_URL;
+  return attribution ? buildTaggedDestination(attribution) : DEFAULT_DISCOVERY_BOOKING_URL;
 }
 
 export function resolveTrackingPayload(pathname: string): TrackingPayload | undefined {
@@ -90,7 +100,7 @@ export function resolveTrackingPayload(pathname: string): TrackingPayload | unde
     destination: buildTaggedDestination(attribution),
     source: attribution.source,
     medium: attribution.medium,
-    campaign: BRAND_CAMPAIGN,
+    campaign: attribution.campaign ?? BRAND_CAMPAIGN,
     content: attribution.content
   };
 }
@@ -120,4 +130,4 @@ export function isTrackablePath(pathname: string): boolean {
   return resolveTrackingPayload(pathname) !== undefined;
 }
 
-export { BOOKING_URL, STATIC_ROUTES };
+export { DEFAULT_DISCOVERY_BOOKING_URL, STATIC_ROUTES };
