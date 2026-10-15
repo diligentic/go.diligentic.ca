@@ -23,6 +23,7 @@ const BRAND_CAMPAIGN = "brand";
 const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
   "/linkedin/about": { source: "linkedin", medium: "profile", content: "ajay-about" },
   "/linkedin/post": { source: "linkedin", medium: "organic", content: "ajay-post" },
+  "/linkedin/services": { source: "linkedin", medium: "profile", content: "ajay-services" },
   "/company/about": { source: "linkedin", medium: "profile", content: "company-about" },
   "/company/services": { source: "linkedin", medium: "profile", content: "company-services" },
   "/youtube/yycaiguy": { source: "youtube", medium: "profile", content: "ajay-channel" },
