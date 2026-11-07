@@ -4,10 +4,15 @@ import { onRequest } from "../functions/_middleware";
 function createContext(
   method = "GET",
   url = "https://links.diligentic.ca/linkedin/about",
-  gtmContainerId = "GTM-TEST123"
+  gtmContainerId = "GTM-TEST123",
+  cf?: Record<string, unknown>
 ) {
+  const request = new Request(url, { method });
+  if (cf) {
+    Object.defineProperty(request, "cf", { value: cf });
+  }
   return {
-    request: new Request(url, { method }),
+    request,
     env: { GTM_CONTAINER_ID: gtmContainerId },
     waitUntil: () => undefined
   };
@@ -32,6 +37,40 @@ describe("Pages middleware", () => {
     expect(body).toContain(
       "https://cal.com/diligentic-ajay/discovery?utm_source=linkedin"
     );
+  });
+
+  it("adds Cloudflare's country and network to the click event", async () => {
+    const response = await onRequest(
+      createContext("GET", undefined, undefined, {
+        country: "IN",
+        asOrganization: "Reliance Jio Infocomm Limited"
+      }) as never
+    );
+    const body = await response.text();
+
+    expect(body).toContain('"link_country":"IN"');
+    expect(body).toContain('"link_network":"Reliance Jio Infocomm Limited"');
+  });
+
+  it("marks country and network unknown when Cloudflare sends none", async () => {
+    const response = await onRequest(createContext() as never);
+    const body = await response.text();
+
+    expect(body).toContain('"link_country":"unknown"');
+    expect(body).toContain('"link_network":"unknown"');
+  });
+
+  it("escapes a hostile network name for script context", async () => {
+    const response = await onRequest(
+      createContext("GET", undefined, undefined, {
+        country: "US",
+        asOrganization: "</script><script>alert(1)</script>"
+      }) as never
+    );
+    const body = await response.text();
+
+    expect(body).not.toContain("<script>alert(1)");
+    expect(body).toContain("\\u003c/script\\u003e");
   });
 
   it("serves a tracking handoff page even if the GTM id is not configured", async () => {

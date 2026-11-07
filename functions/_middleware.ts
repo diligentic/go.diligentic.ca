@@ -32,6 +32,10 @@ function jsonForScript(value: unknown): string {
     .replace(/\u2029/g, "\\u2029");
 }
 
+function cfText(value: unknown): string {
+  return typeof value === "string" && value.trim() ? value.trim() : "unknown";
+}
+
 function createTrackingPage(context: EventContext<Env, string, unknown>): Response {
   const url = new URL(context.request.url);
   const payload = resolveTrackingPayload(url.pathname);
@@ -41,6 +45,7 @@ function createTrackingPage(context: EventContext<Env, string, unknown>): Respon
   }
 
   const containerId = context.env.GTM_CONTAINER_ID?.trim();
+  const cf = context.request.cf as { country?: unknown; asOrganization?: unknown } | undefined;
   const payloadJson = jsonForScript({
     event: "booking_link_click",
     link_path: payload.path,
@@ -48,6 +53,8 @@ function createTrackingPage(context: EventContext<Env, string, unknown>): Respon
     link_medium: payload.medium,
     link_campaign: payload.campaign,
     link_content: payload.content,
+    link_country: cfText(cf?.country),
+    link_network: cfText(cf?.asOrganization),
     eventTimeout: 1000
   });
   const destinationJson = jsonForScript(payload.destination);

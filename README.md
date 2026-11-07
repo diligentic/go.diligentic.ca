@@ -36,7 +36,9 @@ Create a GA4 event tag in GTM:
 
 - Event name: `booking_link_click`
 - Trigger: custom event `booking_link_click`
-- Parameters: `link_path`, `link_source`, `link_medium`, `link_campaign`, `link_content`
+- Parameters: `link_path`, `link_source`, `link_medium`, `link_campaign`, `link_content`, `link_country`, `link_network`
+
+`link_country` is Cloudflare's two-letter country for the visitor's IP (`request.cf.country`), so every click has a country even when GA4's own lookup returns "(not set)". `link_network` is the visitor's network name (`request.cf.asOrganization`), which separates data-centre traffic such as email scanners and link previews from home and office connections. Both are `unknown` when Cloudflare sends no value.
 
 Register those parameters as event-scoped custom dimensions in GA4 before relying on standard reports. Use Cal.com's GTM integration to send the booking-success event into the same GA4 property.
 
