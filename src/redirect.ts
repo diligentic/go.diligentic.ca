@@ -57,6 +57,13 @@ const STATIC_ROUTES: Readonly<Record<string, Attribution>> = Object.freeze({
     content: "crca-directory",
     campaign: "crca-perk-2026",
     bookingUrl: DEFAULT_DISCOVERY_BOOKING_URL
+  },
+  "/crca/job-board": {
+    source: "partner",
+    medium: "profile",
+    content: "crca-job-board",
+    campaign: "crca-perk-2026",
+    bookingUrl: DEFAULT_DISCOVERY_BOOKING_URL
   }
 });
 
