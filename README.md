@@ -40,6 +40,8 @@ Create a GA4 event tag in GTM:
 
 `link_country` is Cloudflare's two-letter country for the visitor's IP (`request.cf.country`), so every click has a country even when GA4's own lookup returns "(not set)". `link_network` is the visitor's network name (`request.cf.asOrganization`), which separates data-centre traffic such as email scanners and link previews from home and office connections. Both are `unknown` when Cloudflare sends no value.
 
+Requests from networks listed in `UNTRACKED_NETWORKS` in `functions/_middleware.ts` (currently `Google LLC`, the daily automated visitor on `/gmb/book`) get a direct `302` to Cal.com with no handoff page, so they never reach GTM or GA4.
+
 Register those parameters as event-scoped custom dimensions in GA4 before relying on standard reports. Use Cal.com's GTM integration to send the booking-success event into the same GA4 property.
 
 Cloudflare D1 is no longer used for click analytics. GA4/GTM is the reporting source of truth.

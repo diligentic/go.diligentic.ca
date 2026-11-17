@@ -36,6 +36,13 @@ function cfText(value: unknown): string {
   return typeof value === "string" && value.trim() ? value.trim() : "unknown";
 }
 
+const UNTRACKED_NETWORKS = new Set(["google llc"]);
+
+function isUntrackedNetwork(request: Request): boolean {
+  const cf = request.cf as { asOrganization?: unknown } | undefined;
+  return UNTRACKED_NETWORKS.has(cfText(cf?.asOrganization).toLowerCase());
+}
+
 function createTrackingPage(context: EventContext<Env, string, unknown>): Response {
   const url = new URL(context.request.url);
   const payload = resolveTrackingPayload(url.pathname);
@@ -105,7 +112,7 @@ function createTrackingPage(context: EventContext<Env, string, unknown>): Respon
 }
 
 export const onRequest: PagesFunction<Env> = (context) => {
-  if (context.request.method === "GET") {
+  if (context.request.method === "GET" && !isUntrackedNetwork(context.request)) {
     return createTrackingPage(context);
   }
 

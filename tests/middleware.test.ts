@@ -60,6 +60,19 @@ describe("Pages middleware", () => {
     expect(body).toContain('"link_network":"unknown"');
   });
 
+  it("redirects Google LLC network requests straight to Cal.com without the tracking page", async () => {
+    const response = await onRequest(
+      createContext("GET", undefined, undefined, {
+        country: "BE",
+        asOrganization: "Google LLC"
+      }) as never
+    );
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toContain("cal.com");
+    expect(await response.text()).toBe("");
+  });
+
   it("escapes a hostile network name for script context", async () => {
     const response = await onRequest(
       createContext("GET", undefined, undefined, {
