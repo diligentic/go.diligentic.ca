@@ -34,12 +34,13 @@ const expectedStaticDestinations: Record<string, string> = {
   "/gmb/book": "https://cal.com/diligentic-ajay/discovery?utm_source=gmb&utm_medium=profile&utm_campaign=brand&utm_content=book-online",
   "/crca-cwic/members": "https://cal.com/diligentic-ajay/crca-cwic-members?utm_source=partner&utm_medium=organic&utm_campaign=crca-perk-oct26&utm_content=crca-cwic",
   "/crca/directory": "https://cal.com/diligentic-ajay/discovery?utm_source=partner&utm_medium=profile&utm_campaign=crca-perk-2026&utm_content=crca-directory",
-  "/crca/job-board": "https://cal.com/diligentic-ajay/discovery?utm_source=partner&utm_medium=profile&utm_campaign=crca-perk-2026&utm_content=crca-job-board"
+  "/crca/job-board": "https://cal.com/diligentic-ajay/discovery?utm_source=partner&utm_medium=profile&utm_campaign=crca-perk-2026&utm_content=crca-job-board",
+  "/crca/footer": "https://cal.com/diligentic-ajay/discovery?utm_source=partner&utm_medium=profile&utm_campaign=crca&utm_content=crca-footer"
 };
 
 describe("resolveDestination", () => {
   it("matches every fixed route exactly", () => {
-    expect(Object.keys(STATIC_ROUTES)).toHaveLength(26);
+    expect(Object.keys(STATIC_ROUTES)).toHaveLength(27);
     for (const [path, destination] of Object.entries(expectedStaticDestinations)) {
       expect(resolveDestination(path)).toBe(destination);
     }
